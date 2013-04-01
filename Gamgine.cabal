@@ -16,6 +16,10 @@ Extra-source-files: c_libraries/glf/glf.h
                     c_libraries/glf/glf.c
                     Gamgine/Utils.cpp
 
+source-repository head
+  type:     git
+  location: https://github.com/dan-t/Gamgine
+
 library
   ghc-options:   -pgmPcpphs -optP--cpp
   extensions:    CPP
