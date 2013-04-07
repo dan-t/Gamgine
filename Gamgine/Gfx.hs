@@ -9,39 +9,89 @@ import Foreign.Storable
 import Data.Array.Storable
 import System.IO
 import Gamgine.Image.PNG
-import Gamgine.Math.Box
+import qualified Gamgine.Math.Box as B
 import Gamgine.Math.Vect
 import Gamgine.Math.BoxTree as BT
 import Gamgine.Control ((?))
 #include "Gamgine/Utils.cpp"
 
-type RGB  = (Double, Double, Double)
-type RGBA = (Double, Double, Double, Double)
+type XYZ      = (Double, Double, Double)
+type RGB      = (Double, Double, Double)
+type RGBA     = (Double, Double, Double, Double)
 type TexCoord = (Double, Double)
 
 floatToFloat :: (RealFloat a, RealFloat b) => a -> b
 floatToFloat = (uncurry encodeFloat) . decodeFloat
 
-f <<* (a, b) = f (floatToFloat a) (floatToFloat b)
-infixl 5 <<*
 
-f <<<* (a, b, c) = f (floatToFloat a) (floatToFloat b) (floatToFloat c)
-infixl 5 <<<*
+class Tuple4d a where
+   t4d_first  :: a -> Double
+   t4d_second :: a -> Double
+   t4d_third  :: a -> Double
+   t4d_forth  :: a -> Double
 
-f <<<<* (a, b, c, d) = f (floatToFloat a) (floatToFloat b) (floatToFloat c) (floatToFloat d)
-infixl 5 <<<<*
+instance Tuple4d (Double, Double, Double, Double) where
+   t4d_first  (f, _, _, _) = f
+   t4d_second (_, s, _, _) = s
+   t4d_third  (_, _, t, _) = t
+   t4d_forth  (_, _, _, f) = f
 
-f <<< (a:.b:.c:.()) = f (floatToFloat a) (floatToFloat b) (floatToFloat c)
+instance Tuple4d (Vec4 Double) where
+   t4d_first  (f:._)           = f
+   t4d_second (_:.s:._)        = s
+   t4d_third  (_:._:.t:._)     = t
+   t4d_forth  (_:._:._:.f:.()) = f
+
+
+class Tuple3d a where
+   t3d_first  :: a -> Double
+   t3d_second :: a -> Double
+   t3d_third  :: a -> Double
+
+instance Tuple3d (Double, Double, Double) where
+   t3d_first  (f, _, _) = f
+   t3d_second (_, s, _) = s
+   t3d_third  (_, _, t) = t
+
+instance Tuple3d (Vec3 Double) where
+   t3d_first  (f:._)        = f
+   t3d_second (_:.s:._)     = s
+   t3d_third  (_:._:.t:.()) = t
+
+
+class Tuple2d a where
+   t2d_first  :: a -> Double
+   t2d_second :: a -> Double
+
+instance Tuple2d (Double, Double) where
+   t2d_first  (f, _) = f
+   t2d_second (_, s) = s
+
+instance Tuple2d (Vec2 Double) where
+   t2d_first  (f:._)     = f
+   t2d_second (_:.s:.()) = s
+
+
+(<<) :: Tuple2d a => (GLfloat -> GLfloat -> IO ()) -> a -> IO ()
+f << a = f (floatToFloat $ t2d_first a)
+           (floatToFloat $ t2d_second a)
+infixl 5 <<
+
+
+(<<<) :: Tuple3d a => (GLfloat -> GLfloat -> GLfloat -> IO ()) -> a -> IO ()
+f <<< a = f (floatToFloat $ t3d_first a)
+            (floatToFloat $ t3d_second a)
+            (floatToFloat $ t3d_third a)
 infixl 5 <<<
 
-class GLVertex a where
-   vertex :: a -> IO ()
 
-instance GLVertex Vect where
-   vertex v = glVertex3f <<< v
+(<<<<) :: Tuple4d a => (GLfloat -> GLfloat -> GLfloat -> GLfloat -> IO ()) -> a -> IO ()
+f <<<< a = f (floatToFloat $ t4d_first a)
+             (floatToFloat $ t4d_second a)
+             (floatToFloat $ t4d_third a)
+             (floatToFloat $ t4d_forth a)
+infixl 5 <<<<
 
-instance GLVertex (Double,Double,Double) where
-   vertex v = glVertex3f <<<* v
 
 quad :: (Double,Double) -> (Double,Double) -> [(Double,Double)]
 quad (minx, miny) (maxx, maxy) =
@@ -50,17 +100,23 @@ quad (minx, miny) (maxx, maxy) =
 quadTexCoords :: Double -> Double -> [(Double,Double)]
 quadTexCoords maxx maxy = [(0,maxy), (maxx,maxy), (maxx,0), (0,0)]
 
-draw :: GLVertex a => GLenum -> [a] -> IO ()
-draw primType vertices = withPrimitive primType $ mapM_ (\v -> vertex v) vertices
+draw :: Tuple3d a => GLenum -> [a] -> IO ()
+draw primType vertices = withPrimitive primType $ mapM_ (glVertex3f <<<) vertices
 
-drawBox :: Box -> IO ()
+drawBox :: B.Box -> IO ()
 drawBox box = do
-   drawQuad (minPt box) (maxPt box)
+   drawQuad (B.minPt box) (B.maxPt box)
 
-drawQuad :: Vect -> Vect -> IO ()
-drawQuad (minX:.minY:._) (maxX:.maxY:._) = do
+drawQuad :: Tuple3d a => a -> a -> IO ()
+drawQuad min max = do
    draw gl_QUADS [(minX, minY, 0 :: Double), (maxX, minY, 0 :: Double),
                   (maxX, maxY, 0 :: Double), (minX, maxY, 0 :: Double)]
+   where
+      minX = t3d_first min
+      minY = t3d_second min
+      maxX = t3d_first max
+      maxY = t3d_second max
+
 
 drawBoxTree :: BT.BoxTree a -> IO ()
 drawBoxTree tree = do
@@ -69,7 +125,7 @@ drawBoxTree tree = do
       go (Node box ts) = drawBox box >> mapM_ (\t -> go t) ts
       go (Leaf box _)  = drawBox box
 
-drawPoint :: Vect -> RGB -> IO ()
+drawPoint :: Tuple3d a => a -> RGB -> IO ()
 drawPoint pos color = do
    glPointSize 10
    glBegin gl_POINTS
@@ -141,7 +197,7 @@ renderTexturedQuad size texture =
          withPrimitive gl_QUADS $ do
             let coords   = quadTexCoords 1 1
                 vertices = quad (0,0) size
-            glColor3f <<<* (1,1,1)
+            glColor3f <<< ((1, 1, 1) :: RGB)
             forM_ (zip coords vertices) (\(c,v) -> do
-               glTexCoord2f <<* c
-               glVertex2f <<* v)
+               glTexCoord2f << c
+               glVertex2f << v)
