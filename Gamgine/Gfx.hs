@@ -15,10 +15,27 @@ import Gamgine.Math.BoxTree as BT
 import Gamgine.Control ((?))
 #include "Gamgine/Utils.cpp"
 
-type XYZ      = (Double, Double, Double)
-type RGB      = (Double, Double, Double)
-type RGBA     = (Double, Double, Double, Double)
-type TexCoord = (Double, Double)
+type XY   = (Double, Double)
+type XYZ  = (Double, Double, Double)
+type XYZW = (Double, Double, Double, Double)
+type RGB  = (Double, Double, Double)
+type RGBA = (Double, Double, Double, Double)
+
+xy :: Double -> Double -> XY
+xy x y = (x, y)
+
+xyz :: Double -> Double -> Double -> XYZ
+xyz x y z = (x, y, z)
+
+xyzw :: Double -> Double -> Double -> Double -> XYZW
+xyzw x y z w = (x, y, z, w)
+
+rgb :: Double -> Double -> Double -> RGB
+rgb r g b = (r, g, b)
+
+rgba :: Double -> Double -> Double -> Double -> RGBA
+rgba r g b a = (r, g, b, a)
+
 
 floatToFloat :: (RealFloat a, RealFloat b) => a -> b
 floatToFloat = (uncurry encodeFloat) . decodeFloat
