@@ -1,22 +1,23 @@
 
 module Gamgine.Engine where
-import Graphics.UI.GLFW
+import Graphics.UI.GLFW (getTime)
 import Control.Monad.State (MonadIO, liftIO)
 
-updateLoop :: (MonadIO m) => Double -> Int -> m a -> Double -> m (Double, Double)
-updateLoop skipTicks maxFrameSkip update nextFrame = do
-   loop skipTicks maxFrameSkip update nextFrame 0
+
+mkUpdateLoop :: (MonadIO m) => Int -> Int -> m a -> (Double -> m (Double, Double))
+mkUpdateLoop ticksPerSecond maxFrameSkip update = \nextFrame -> loop nextFrame 0
    where
-      loop :: (MonadIO m) => Double -> Int -> m a -> Double -> Int -> m (Double, Double)
-      loop skipTicks maxFrameSkip update nextFrame skippedFrames = do
+      loop nextFrame skippedFrames = do
 	 time <- liftIO getTime
 	 if time > nextFrame && skippedFrames < maxFrameSkip
 	    then do
 	       update
-	       loop skipTicks maxFrameSkip update (nextFrame + skipTicks) (skippedFrames + 1)
+	       loop (nextFrame + skipTicks) (skippedFrames + 1)
 	    else do
-	       interpol <- interpolation time nextFrame skipTicks
-	       return (nextFrame,interpol)
+	       let interpol = interpolation time nextFrame skipTicks
+	       return (nextFrame, interpol)
 
-      interpolation time nextFrame skipTicks = do
-	 return $ (time - skipTicks - nextFrame) / skipTicks
+      interpolation time nextFrame skipTicks =
+	 (time - skipTicks - nextFrame) / skipTicks
+
+      skipTicks = 1 / (fromIntegral ticksPerSecond :: Double)
