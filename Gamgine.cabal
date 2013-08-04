@@ -52,7 +52,7 @@ library
                    Gamgine.Lens.IORef
                    Gamgine.Lens.State
 
-  Build-Depends: base > 3 && < 5, GLFW-b, OpenGLRaw, mtl, time, Vec >= 0.9.9, utility-ht, directory, StateVar, array, bytestring, unordered-containers, data-lens, pretty-show, cpphs, filepath, parsec, zlib, ListZipper, composition
+  Build-Depends: base > 3 && < 5, GLFW-b < 1.0.0, OpenGLRaw, mtl, time, Vec >= 0.9.9, utility-ht, directory, StateVar, array, bytestring, unordered-containers, data-lens, pretty-show, cpphs, filepath, parsec, zlib, ListZipper, composition
 
   Include-dirs: .
                 Gamgine
