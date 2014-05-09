@@ -1,62 +1,86 @@
-Name:          Gamgine
-Version:       0.1
-License:       BSD3
-License-file:  LICENSE
-Author:        Daniel Trstenjak
-Maintainer:    daniel.trstenjak@gmail.com
-Build-Type:    Simple
-Category:      Library
-Cabal-Version: >=1.6
-Synopsis:      Some kind of game library or set of utilities.
-Description:   Some kind of game library or set of utilities.
-
-data-files:    Ressources/Fonts/*.glf
-
-Extra-source-files: c_libraries/glf/glf.h
-                    c_libraries/glf/glf.c
-                    Gamgine/Utils.cpp
-
+name: Gamgine
+version: 0.1
+cabal-version: >=1.6
+build-type: Simple
+license: BSD3
+license-file: LICENSE
+maintainer: daniel.trstenjak@gmail.com
+synopsis: Some kind of game library or set of utilities.
+description:
+    Some kind of game library or set of utilities.
+category: Library
+author: Daniel Trstenjak
+data-files:
+    Ressources/Fonts/*.glf
+extra-source-files:
+    c_libraries/glf/glf.h
+    c_libraries/glf/glf.c
+    Gamgine/Utils.cpp
+ 
 source-repository head
-  type:     git
-  location: https://github.com/dan-t/Gamgine
-
+    type: git
+    location: https://github.com/dan-t/Gamgine
+ 
 library
-  ghc-options:   -pgmPcpphs -optP--cpp
-  extensions:    CPP
-  cpp-options:   -DCABAL
-  exposed-modules: Gamgine.Coroutine
-                   Gamgine.Bool
-                   Gamgine.Math.Matrix
-                   Gamgine.Math.Utils
-                   Gamgine.Math.BoxTree
-                   Gamgine.Math.Vect
-                   Gamgine.Math.Box
-                   Gamgine.State.RenderState
-                   Gamgine.State.StateTreeZipper
-                   Gamgine.State.MouseInfo
-                   Gamgine.State.KeyInfo
-                   Gamgine.State.State
-                   Gamgine.State.StateTree
-                   Gamgine.State.InputInfo
-                   Gamgine.Font.GLF
-                   Gamgine.Control
-                   Gamgine.Utils
-                   Gamgine.Gfx
-                   Gamgine.Engine
-                   Gamgine.Image.PNG.Internal.Filters
-                   Gamgine.Image.PNG.Internal.Parser
-                   Gamgine.Image.PNG.Internal.CRC
-                   Gamgine.Image.PNG
-                   Gamgine.System
-                   Gamgine.Zipper
-                   Gamgine.Lens.IORef
-                   Gamgine.Lens.State
-
-  Build-Depends: base > 3 && < 5, GLFW-b < 1.0.0, OpenGLRaw, mtl, time, Vec >= 0.9.9, utility-ht, directory, StateVar, array, bytestring, unordered-containers, data-lens, pretty-show, cpphs, filepath, parsec, zlib, ListZipper, composition
-
-  Include-dirs: .
-                Gamgine
-                c_libraries/glf
-  Includes:     glf.h
-  C-sources:    c_libraries/glf/glf.c
-  CC-Options:   -Wno-unused-result
+    build-depends:
+        base >3 && <5,
+        GLFW-b <1.0.0,
+        OpenGLRaw -any,
+        mtl -any,
+        time -any,
+        Vec >=0.9.9,
+        utility-ht -any,
+        directory -any,
+        StateVar -any,
+        array -any,
+        bytestring -any,
+        unordered-containers -any,
+        data-lens -any,
+        pretty-show -any,
+        cpphs -any,
+        filepath -any,
+        parsec -any,
+        zlib -any,
+        ListZipper -any,
+        composition -any
+    exposed-modules:
+        Gamgine.Coroutine
+        Gamgine.Bool
+        Gamgine.Math.Matrix
+        Gamgine.Math.Utils
+        Gamgine.Math.BoxTree
+        Gamgine.Math.Vect
+        Gamgine.Math.Box
+        Gamgine.State.RenderState
+        Gamgine.State.StateTreeZipper
+        Gamgine.State.MouseInfo
+        Gamgine.State.KeyInfo
+        Gamgine.State.State
+        Gamgine.State.StateTree
+        Gamgine.State.InputInfo
+        Gamgine.Font.GLF
+        Gamgine.Control
+        Gamgine.Utils
+        Gamgine.Gfx
+        Gamgine.Engine
+        Gamgine.Image.PNG.Internal.Filters
+        Gamgine.Image.PNG.Internal.Parser
+        Gamgine.Image.PNG.Internal.CRC
+        Gamgine.Image.PNG
+        Gamgine.System
+        Gamgine.Zipper
+        Gamgine.Lens.IORef
+        Gamgine.Lens.State
+    exposed: True
+    buildable: True
+    cpp-options: -DCABAL
+    cc-options: -Wno-unused-result
+    c-sources:
+        c_libraries/glf/glf.c
+    extensions: CPP
+    includes:
+        glf.h
+    include-dirs: . Gamgine c_libraries/glf
+    ghc-options: -pgmPcpphs -optP--cpp
+ 
+ 
