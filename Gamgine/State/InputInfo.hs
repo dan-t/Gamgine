@@ -1,9 +1,9 @@
 
 module Gamgine.State.InputInfo where
 import qualified Graphics.UI.GLFW as GLFW
-import Control.Monad (liftM2)
 import Gamgine.Control ((?))
 import qualified Gamgine.Math.Vect as V
+import Control.Applicative ((<$>), (<*>))
 
 data Modifier = Ctrl | Alt | Shift deriving (Eq, Ord)
 
@@ -13,14 +13,17 @@ type MousePos = V.Vect
 -- | if the key/mouse button was pressed or released
 data InputState = Pressed | Released deriving (Eq, Ord)
 
-pressedModifiers :: IO [Modifier]
-pressedModifiers = do
-   ctrl  <- isCtrlPressed
-   shift <- isShiftPressed
-   alt   <- isAltPressed
-   return $ (ctrl ? [Ctrl] $ []) ++ (shift ? [Shift] $ []) ++ (alt ? [Alt] $ [])
-         
-isCtrlPressed, isAltPressed, isShiftPressed :: IO Bool
-isCtrlPressed  = liftM2 (||) (GLFW.keyIsPressed GLFW.KeyLeftCtrl)  (GLFW.keyIsPressed GLFW.KeyRightCtrl)
-isAltPressed   = liftM2 (||) (GLFW.keyIsPressed GLFW.KeyLeftAlt)   (GLFW.keyIsPressed GLFW.KeyRightAlt)
-isShiftPressed = liftM2 (||) (GLFW.keyIsPressed GLFW.KeyLeftShift) (GLFW.keyIsPressed GLFW.KeyRightShift)
+pressedModifiers :: GLFW.Window -> IO [Modifier]
+pressedModifiers win = do
+   ctrlPressed  <- isCtrlPressed win
+   shiftPressed <- isShiftPressed win
+   altPressed   <- isAltPressed win
+   return $ [Ctrl | ctrlPressed] ++ [Shift | shiftPressed] ++ [Alt | altPressed]
+
+isCtrlPressed, isAltPressed, isShiftPressed :: GLFW.Window -> IO Bool
+isCtrlPressed  win = (||) <$> isKeyPressed win GLFW.Key'LeftControl <*> isKeyPressed win GLFW.Key'RightControl
+isAltPressed   win = (||) <$> isKeyPressed win GLFW.Key'LeftAlt     <*> isKeyPressed win GLFW.Key'RightAlt
+isShiftPressed win = (||) <$> isKeyPressed win GLFW.Key'LeftShift   <*> isKeyPressed win GLFW.Key'RightShift
+
+isKeyPressed :: GLFW.Window -> GLFW.Key -> IO Bool
+isKeyPressed win key = (== GLFW.KeyState'Pressed) <$> GLFW.getKey win key

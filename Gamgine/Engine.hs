@@ -2,13 +2,15 @@
 module Gamgine.Engine where
 import Graphics.UI.GLFW (getTime)
 import Control.Monad.State (MonadIO, liftIO)
+import Control.Applicative ((<$>))
+import Data.Maybe (fromMaybe)
 
 
 mkUpdateLoop :: (MonadIO m) => Int -> Int -> m a -> (Double -> m (Double, Double))
 mkUpdateLoop ticksPerSecond maxFrameSkip update = \nextFrame -> loop nextFrame 0
    where
       loop nextFrame skippedFrames = do
-	 time <- liftIO getTime
+	 time <- liftIO (fromMaybe nextFrame <$> getTime)
 	 if time > nextFrame && skippedFrames < maxFrameSkip
 	    then do
 	       update
