@@ -13,5 +13,5 @@ data KeyInfo = KeyInfo {
    -- the current mouse position in world coordinates
    mousePos  :: II.MousePos,
    -- if a modifier key is additionally pressed
-   modifiers :: [II.Modifier]
+   modifiers :: GLFW.ModifierKeys
    }

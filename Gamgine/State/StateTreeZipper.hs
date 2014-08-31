@@ -93,7 +93,7 @@ transitionAppliesKI ki (ByKey key status) =
    KI.key ki == key && KI.status ki == status
 
 transitionAppliesKI ki (ByKeyWithMod key status mod) =
-   KI.key ki == key && KI.status ki == status && L.any (== mod) (KI.modifiers ki)
+   KI.key ki == key && KI.status ki == status && II.isModifierPressed mod (KI.modifiers ki)
 
 transitionAppliesKI _ _ = False
 
@@ -104,6 +104,6 @@ transitionAppliesMI mi (ByMouse button status) =
    MI.button mi == button && MI.status mi == status
 
 transitionAppliesMI mi (ByMouseWithMod button status mod) =
-   MI.button mi == button && MI.status mi == status && L.any (== mod) (MI.modifiers mi)
+   MI.button mi == button && MI.status mi == status && II.isModifierPressed mod (MI.modifiers mi)
 
 transitionAppliesMI _ _ = False
