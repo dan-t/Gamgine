@@ -180,7 +180,7 @@ toPngImage chunks = do
   case mapM toPngChunk chunks >>= return . partition isIDAT of
     Right (_, []) -> return $ Left "File has no chunks!"
     Right (dataChunks, hdr:otherChunks)  -> do
-                      let dataDecompressed = decompress . LBS.unLSB . LBS.concat . map idat_data $ dataChunks
+                      let dataDecompressed = decompress . LBS.unLBS . LBS.concat . map idat_data $ dataChunks
                           bpp = bytesPerPixel (ihdr_colorType hdr) (ihdr_bitDepth hdr)
                           w = fromIntegral (ihdr_width hdr)
                           h = fromIntegral (ihdr_height hdr)
