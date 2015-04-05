@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Gamgine.Math.Vect (module Data.Vec,Vect,Vect4,x,y,z,v3,v4,fromTuple,toTuple,fromVect4,len,
                           inverseVec,clampVec,maxVec,minVec,index,absVec,nullVec,and,or,all,any) where
 

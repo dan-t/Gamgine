@@ -1,4 +1,4 @@
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BangPatterns, FlexibleContexts #-}
 
 module Gamgine.Image.PNG.Internal.Filters (defilter_scanlines_arr) where
 
