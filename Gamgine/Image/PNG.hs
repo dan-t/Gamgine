@@ -3,7 +3,7 @@
 -- Module      :  Graphics.Formats.PNG
 -- Copyright   :  (c) Marko Lauronen 2008
 -- License     :  BSD
--- 
+--
 -- Maintainer  :  marko.lauronen@pp1.inet.fi
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC only)
@@ -37,8 +37,6 @@ import Data.Array.Unboxed
 import Data.Array.Storable
 import Data.Word
 import Data.List
-import qualified Data.ByteString.Lazy as LB
-import qualified Data.ByteString.Lazy.Char8 as C
 import Data.Int
 import Data.Char
 import System.IO
@@ -48,6 +46,8 @@ import Control.Monad.Error
 import Gamgine.Image.PNG.Internal.Parser
 import Gamgine.Image.PNG.Internal.CRC
 import Gamgine.Image.PNG.Internal.Filters
+import qualified Gamgine.Image.PNG.Internal.LBS as LBS
+import Gamgine.Image.PNG.Internal.LBS (LBS)
 
 -- | Type for raw PNG chunks
 -- The parsing happens in two phases: first the file is read into
@@ -56,7 +56,7 @@ import Gamgine.Image.PNG.Internal.Filters
 -- with raw chunk data.
 data RawPNGChunk = RawPNGChunk {
       rawPngChunk_type  :: !String,
-      rawPngChunk_data  :: !LB.ByteString
+      rawPngChunk_data  :: !LBS
     } deriving (Show)
 
 type Width  = Word32
@@ -76,7 +76,7 @@ data PNGChunk =
   | PLTE {
       plte_entries :: !(Array Word8 Rgb) }
   | IDAT {
-      idat_data :: !LB.ByteString }
+      idat_data :: !LBS }
   | UnknownChunk RawPNGChunk    -- chunk types not supported yet
   | IEND
     deriving (Show)
@@ -102,8 +102,8 @@ instance Show PNGImage where
 
 -- | Raw chunk parsing
 
-pngHeaderBytes :: LB.ByteString
-pngHeaderBytes = LB.pack [137, 80, 78, 71, 13, 10, 26, 10]
+pngHeaderBytes :: LBS
+pngHeaderBytes = LBS.pack [137, 80, 78, 71, 13, 10, 26, 10]
 
 pngFile :: Parser [RawPNGChunk]
 pngFile = do
@@ -119,9 +119,9 @@ rawPngChunk = do
   len <- anyWord32
   chunkType <- block 4
   chunkData <- block (fromIntegral len)
-  let expectedCrc = crc (LB.concat [chunkType,chunkData])
+  let expectedCrc = crc (LBS.concat [chunkType,chunkData])
   word32 expectedCrc <?> "valid crc"
-  return $ RawPNGChunk (C.unpack chunkType) chunkData
+  return $ RawPNGChunk (LBS.unpackToString chunkType) chunkData
 
 -- | Final chunk parsing
 
@@ -142,12 +142,12 @@ parseIhdr = do
   --[(0,Ct0), (2,Ct2), (3,Ct3), (4,Ct4), (6,Ct6)]
   colorType <- allowedValues word8 [(2,Ct2), (6,Ct6)]
                <?> "valid colorType: supported Ct2,Ct6"
-  compressionMethod <- allowedValues word8 [(0, Deflate)] 
+  compressionMethod <- allowedValues word8 [(0, Deflate)]
                        <?> "valid compression method: supported Deflate"
-  filterMethod <- allowedValues word8 [(0, Adaptive)] 
+  filterMethod <- allowedValues word8 [(0, Adaptive)]
                   <?> "valid filter method: supported Adaptive"
-  -- [(0, NoInterlace), (1, Adam7)] 
-  interlaceMethod <- allowedValues word8 [(0, NoInterlace)] 
+  -- [(0, NoInterlace), (1, Adam7)]
+  interlaceMethod <- allowedValues word8 [(0, NoInterlace)]
                      <?> "valid interlace method: supported NoInterlace"
   return $ IHDR {
                ihdr_width = width
@@ -180,7 +180,7 @@ toPngImage chunks = do
   case mapM toPngChunk chunks >>= return . partition isIDAT of
     Right (_, []) -> return $ Left "File has no chunks!"
     Right (dataChunks, hdr:otherChunks)  -> do
-                      let dataDecompressed = decompress . LB.concat . map idat_data $ dataChunks
+                      let dataDecompressed = decompress . LBS.unLSB . LBS.concat . map idat_data $ dataChunks
                           bpp = bytesPerPixel (ihdr_colorType hdr) (ihdr_bitDepth hdr)
                           w = fromIntegral (ihdr_width hdr)
                           h = fromIntegral (ihdr_height hdr)
