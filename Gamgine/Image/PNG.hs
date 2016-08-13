@@ -41,7 +41,7 @@ import Data.Int
 import Data.Char
 import System.IO
 
-import Control.Monad.Error
+import Control.Monad.Except
 
 import Gamgine.Image.PNG.Internal.Parser
 import Gamgine.Image.PNG.Internal.CRC

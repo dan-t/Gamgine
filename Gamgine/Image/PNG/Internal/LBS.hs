@@ -40,7 +40,7 @@ unpackToString = C.unpack . unLBS
 splitAt :: Int64 -> LBS -> (LBS, LBS)
 splitAt idx (LBS bs) =
     let (bs1, bs2) = LB.splitAt idx bs
-	in (LBS bs1, LBS bs2)
+        in (LBS bs1, LBS bs2)
 
 readFile :: FilePath -> IO LBS
 readFile fp = LBS <$> LB.readFile fp

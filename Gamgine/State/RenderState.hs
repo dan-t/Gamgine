@@ -3,7 +3,7 @@ module Gamgine.State.RenderState where
 #include "Gamgine/Utils.cpp"
 import Control.Applicative ((<$>))
 import qualified Data.List as L
-import qualified Graphics.Rendering.OpenGL.Raw as GL
+import qualified Graphics.GL as GL
 import qualified Gamgine.Font.GLF as GLF
 IMPORT_LENS_AS_LE
 

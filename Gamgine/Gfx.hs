@@ -1,7 +1,7 @@
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 
 module Gamgine.Gfx where
-import Graphics.Rendering.OpenGL.Raw
+import Graphics.GL
 import Control.Monad (forM_)
 import Data.Either
 import Foreign.Marshal.Utils
@@ -126,7 +126,7 @@ drawBox box = do
 
 drawQuad :: Tuple3d a => a -> a -> IO ()
 drawQuad min max = do
-   draw gl_QUADS [(minX, minY, 0 :: Double), (maxX, minY, 0 :: Double),
+   draw GL_QUADS [(minX, minY, 0 :: Double), (maxX, minY, 0 :: Double),
                   (maxX, maxY, 0 :: Double), (minX, maxY, 0 :: Double)]
    where
       minX = t3d_first min
@@ -145,7 +145,7 @@ drawBoxTree tree = do
 drawPoint :: Tuple3d a => a -> RGB -> IO ()
 drawPoint pos color = do
    glPointSize 10
-   glBegin gl_POINTS
+   glBegin GL_POINTS
    glVertex3f <<< pos
    glEnd
 
@@ -164,9 +164,9 @@ withPushedMatrix act = do
 
 withPolyMode :: GLenum -> IO () -> IO ()
 withPolyMode mode act = do
-   glPolygonMode gl_FRONT_AND_BACK mode
+   glPolygonMode GL_FRONT_AND_BACK mode
    act
-   glPolygonMode gl_FRONT_AND_BACK gl_FILL
+   glPolygonMode GL_FRONT_AND_BACK GL_FILL
 
 withEnabled :: GLenum -> IO () -> IO ()
 withEnabled mode act = do
@@ -177,12 +177,12 @@ withEnabled mode act = do
 withBlend :: GLenum -> GLenum -> IO () -> IO ()
 withBlend srcFactor dstFactor act = do
    glBlendFunc srcFactor dstFactor
-   withEnabled gl_BLEND act
+   withEnabled GL_BLEND act
 
 withTexture2d :: GLuint -> IO () -> IO ()
 withTexture2d id act = do
-   glBindTexture gl_TEXTURE_2D id
-   withEnabled gl_TEXTURE_2D act
+   glBindTexture GL_TEXTURE_2D id
+   withEnabled GL_TEXTURE_2D act
 
 makeTexture2d :: FilePath -> GLenum -> IO GLuint
 makeTexture2d file wrapMode = do
@@ -194,24 +194,24 @@ makeTexture2d file wrapMode = do
       genTex img = do
 	 let (width, height) = dimensions img
              imgData         = imageData img
-	     format          = hasAlphaChannel img ? gl_RGBA $ gl_RGB
+	     format          = hasAlphaChannel img ? GL_RGBA $ GL_RGB
 	 id <- with 0 (\buf -> glGenTextures 1 buf >> peek buf)
-	 glBindTexture gl_TEXTURE_2D id
-	 glTexParameteri gl_TEXTURE_2D gl_TEXTURE_WRAP_S (fromIntegral wrapMode)
-	 glTexParameteri gl_TEXTURE_2D gl_TEXTURE_WRAP_T (fromIntegral wrapMode)
-	 glTexParameteri gl_TEXTURE_2D gl_TEXTURE_MAG_FILTER (fromIntegral gl_NEAREST)
-	 glTexParameteri gl_TEXTURE_2D gl_TEXTURE_MIN_FILTER (fromIntegral gl_NEAREST)
+	 glBindTexture GL_TEXTURE_2D id
+	 glTexParameteri GL_TEXTURE_2D GL_TEXTURE_WRAP_S (fromIntegral wrapMode)
+	 glTexParameteri GL_TEXTURE_2D GL_TEXTURE_WRAP_T (fromIntegral wrapMode)
+	 glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER (fromIntegral GL_NEAREST)
+	 glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER (fromIntegral GL_NEAREST)
 	 withStorableArray imgData (\array ->
-	    glTexImage2D gl_TEXTURE_2D 0 (fromIntegral format) (fromIntegral width)
-	                 (fromIntegral height) 0 (fromIntegral format) gl_UNSIGNED_BYTE array)
+	    glTexImage2D GL_TEXTURE_2D 0 (fromIntegral format) (fromIntegral width)
+	                 (fromIntegral height) 0 (fromIntegral format) GL_UNSIGNED_BYTE array)
 	 return id
 
 
 renderTexturedQuad :: (Double,Double) -> GLuint -> IO ()
 renderTexturedQuad size texture =
    withTexture2d texture $
-      withBlend gl_SRC_ALPHA gl_ONE_MINUS_SRC_ALPHA $
-         withPrimitive gl_QUADS $ do
+      withBlend GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA $
+         withPrimitive GL_QUADS $ do
             let coords   = quadTexCoords 1 1
                 vertices = quad (0,0) size
             glColor3f <<< ((1, 1, 1) :: RGB)

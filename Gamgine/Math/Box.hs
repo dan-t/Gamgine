@@ -59,7 +59,7 @@ minOverlap :: Box -> Box -> Vect
 minOverlap (Box min1 max1) (Box min2 max2) = V.fromList $ L.map overlap [0..2]
    where
       overlap dim =
-	 let v1@(minv1, maxv1) = (getElem dim min1, getElem dim max1)
+         let v1@(minv1, maxv1) = (getElem dim min1, getElem dim max1)
              v2@(minv2, maxv2) = (getElem dim min2, getElem dim max2)
              in if maxv1 < minv2 || minv1 > maxv2
                    then 0

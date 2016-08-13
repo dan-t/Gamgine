@@ -21,8 +21,8 @@ getEnvOrDefault :: String -> String -> IO String
 getEnvOrDefault envVar defaultValue = do
    result <- try $ getEnv envVar
    case result of
-	Right value          -> return value
-	Left  (_ :: IOError) -> return defaultValue
+        Right value          -> return value
+        Left  (_ :: IOError) -> return defaultValue
 
 appDirectory = normalizedProgName >>= \pn -> getAppUserDataDirectory pn
 

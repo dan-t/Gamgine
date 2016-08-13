@@ -29,7 +29,7 @@ replaceBy f new as = map (\a -> if f a then new else a) as
 errorsToStderr :: IO () -> IO ()
 errorsToStderr action =
    catch action (\e -> do pn <- normalizedProgName
-			  hPutStrLn stderr ("\n" ++ pn ++ ": " ++ show (e :: SomeException)))
+                          hPutStrLn stderr ("\n" ++ pn ++ ": " ++ show (e :: SomeException)))
 
 showValue :: Show a => String -> a -> String
 showValue name value = name ++ ": " ++ (show value) ++ "\n"
