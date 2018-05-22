@@ -1,5 +1,5 @@
 name: Gamgine
-version: 0.5.2
+version: 0.5.3
 cabal-version: >=1.6
 build-type: Simple
 license: BSD3
@@ -53,8 +53,8 @@ library
         Gamgine.Lens.State
     build-depends:
         base >3 && <5,
-        GLFW-b >=1.0 && <1.5,
-        OpenGLRaw >=3.0.0.0 && <3.3,
+        GLFW-b >=1.0 && <3.3,
+        OpenGLRaw >=3.0.0.0 && <3.4,
         mtl >=2.1.3.1 && <2.3,
         time >=1.4.0.1 && <1.9,
         Vec >=1.0.1 && <1.1,
@@ -65,7 +65,7 @@ library
         bytestring >=0.10.0.2 && <0.11,
         unordered-containers >=0.2.4.0 && <0.3,
         data-lens >=2.10.4 && <2.12,
-        pretty-show >=1.6.7 && <1.7,
+        pretty-show >=1.6.7 && <1.8,
         cpphs >=1.18.4 && <1.21,
         filepath >=1.3.0.1 && <1.5,
         parsec >=3.1.5 && <3.2,
