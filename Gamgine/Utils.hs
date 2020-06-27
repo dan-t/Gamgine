@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Gamgine.Utils where
 #include "Gamgine/Utils.cpp"
 import Gamgine.Control ((?))
@@ -69,3 +71,9 @@ bytesFromStorableArray :: Int -> StorableArray (Int, Int) Word8 -> IO BL.ByteStr
 bytesFromStorableArray n array = do
    bytes <- withStorableArray array (bytesFromPointer n)
    return bytes
+
+
+#if (MIN_VERSION_base(4,9,0))
+instance MonadFail (Either String) where
+   fail = Left
+#endif

@@ -48,6 +48,7 @@ import Gamgine.Image.PNG.Internal.CRC
 import Gamgine.Image.PNG.Internal.Filters
 import qualified Gamgine.Image.PNG.Internal.LBS as LBS
 import Gamgine.Image.PNG.Internal.LBS (LBS)
+import Gamgine.Utils ()
 
 -- | Type for raw PNG chunks
 -- The parsing happens in two phases: first the file is read into

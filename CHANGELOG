@@ -1,3 +1,7 @@
+0.6.0
+-----
+* Support ghc 8.10.1
+
 0.5.3
 -----
 * Raise upper bounds of GLFW-b, OpenGLRaw and pretty-show

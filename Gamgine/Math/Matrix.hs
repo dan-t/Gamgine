@@ -53,7 +53,7 @@ mkOrtho Frustum {left = l, right = r, bottom = b, top = t, near = n, far = f} =
 
 
 mkScale :: Vect -> Matrix
-mkScale v = scale (snoc v 1) identity 
+mkScale v = scale (snoc v 1) identity
 
 
 mkTranslate :: Vect -> Matrix
@@ -64,11 +64,11 @@ mkWindowMatrix :: Window -> Matrix
 mkWindowMatrix (width, height) = toGLFW dHeight `multmm` unitCubeToWin dWidth dHeight
    where
       unitCubeToWin :: Double -> Double -> Matrix
-      unitCubeToWin width height = 
-	 mkScale (v3 (width*0.5) (height*0.5) 0.5) `multmm` mkTranslate (v3 1 1 1)
+      unitCubeToWin width height =
+         mkScale (v3 (width*0.5) (height*0.5) 0.5) `multmm` mkTranslate (v3 1 1 1)
 
       toGLFW :: Double -> Matrix
-      toGLFW height = mkTranslate (v3 0 height 0) `multmm` mkScale (v3 1 (-1) 1) 
+      toGLFW height = mkTranslate (v3 0 height 0) `multmm` mkScale (v3 1 (-1) 1)
 
       dWidth  = fromIntegral width
       dHeight = fromIntegral height
@@ -85,8 +85,8 @@ mkWinToWorldMatrix win frust = inverseOrIdentity $ mkWorldToWinMatrix win frust
 inverseOrIdentity :: Matrix -> Matrix
 inverseOrIdentity m =
    case invert m of
-	Nothing -> identity
-	Just m  -> m
+        Nothing -> identity
+        Just m  -> m
 
 
 winToWorld :: Matrix -> WinCoord -> Vect

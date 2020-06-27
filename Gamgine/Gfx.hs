@@ -189,22 +189,22 @@ makeTexture2d file wrapMode = do
    res <- loadPNGFile file
    either (\str -> ERROR str)
           (\img -> genTex img)
-	  res
+          res
    where
       genTex img = do
-	 let (width, height) = dimensions img
+         let (width, height) = dimensions img
              imgData         = imageData img
-	     format          = hasAlphaChannel img ? GL_RGBA $ GL_RGB
-	 id <- with 0 (\buf -> glGenTextures 1 buf >> peek buf)
-	 glBindTexture GL_TEXTURE_2D id
-	 glTexParameteri GL_TEXTURE_2D GL_TEXTURE_WRAP_S (fromIntegral wrapMode)
-	 glTexParameteri GL_TEXTURE_2D GL_TEXTURE_WRAP_T (fromIntegral wrapMode)
-	 glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER (fromIntegral GL_NEAREST)
-	 glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER (fromIntegral GL_NEAREST)
-	 withStorableArray imgData (\array ->
-	    glTexImage2D GL_TEXTURE_2D 0 (fromIntegral format) (fromIntegral width)
-	                 (fromIntegral height) 0 (fromIntegral format) GL_UNSIGNED_BYTE array)
-	 return id
+             format          = hasAlphaChannel img ? GL_RGBA $ GL_RGB
+         id <- with 0 (\buf -> glGenTextures 1 buf >> peek buf)
+         glBindTexture GL_TEXTURE_2D id
+         glTexParameteri GL_TEXTURE_2D GL_TEXTURE_WRAP_S (fromIntegral wrapMode)
+         glTexParameteri GL_TEXTURE_2D GL_TEXTURE_WRAP_T (fromIntegral wrapMode)
+         glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER (fromIntegral GL_NEAREST)
+         glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER (fromIntegral GL_NEAREST)
+         withStorableArray imgData (\array ->
+            glTexImage2D GL_TEXTURE_2D 0 (fromIntegral format) (fromIntegral width)
+                         (fromIntegral height) 0 (fromIntegral format) GL_UNSIGNED_BYTE array)
+         return id
 
 
 renderTexturedQuad :: (Double,Double) -> GLuint -> IO ()
