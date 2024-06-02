@@ -42,6 +42,7 @@ import Data.Char
 import System.IO
 
 import Control.Monad.Except
+import Control.Monad (when, liftM3)
 
 import Gamgine.Image.PNG.Internal.Parser
 import Gamgine.Image.PNG.Internal.CRC
